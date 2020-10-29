@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
         "predeploy"
+    ],
+    "cSpell.ignoreWords": [
+        "supertest"
     ]
 }

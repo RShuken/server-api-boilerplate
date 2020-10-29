@@ -27,6 +27,7 @@ describe.only('Articles Endpoints', function () {
   describe('GET /articles', () => {
     context('Given no articles', () => {
       it('responds with 200 and an empty list', () => {
+        // eslint-disable-next-line no-undef
         return supertest(app)
           .get('/articles')
           .expect(200, []);
@@ -41,20 +42,22 @@ describe.only('Articles Endpoints', function () {
       });
 
       it('responds with 200 and all of the articles', () => {
+        // eslint-disable-next-line no-undef
         return supertest(app).get('/articles').expect(200, testArticles);
       });
     });
   });
 
-    describe('GET /articles/:article_id', () => {
-         context(`Given no articles`, () => {
-     it(`responds with 404`, () => {
-       const articleId = 123456
-       return supertest(app)
-         .get(`/articles/${articleId}`)
-         .expect(404, { error: { message: `Article doesn't exist` } })
-     })
-   })
+  describe('GET /articles/:article_id', () => {
+    context('Given no articles', () => {
+      it('responds with 404', () => {
+        const articleId = 123456;
+        // eslint-disable-next-line no-undef
+        return supertest(app)
+          .get(`/articles/${articleId}`)
+          .expect(404, { error: { message: 'Article doesn\'t exist' } });
+      });
+    });
 
 
 
@@ -68,6 +71,7 @@ describe.only('Articles Endpoints', function () {
       it('responds with 200 and the specified article', () => {
         const articleId = 2;
         const expectedArticle = testArticles[articleId - 1];
+        // eslint-disable-next-line no-undef
         return supertest(app)
           .get(`/articles/${articleId}`)
           .expect(200, expectedArticle);

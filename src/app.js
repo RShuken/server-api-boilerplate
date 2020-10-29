@@ -6,7 +6,8 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-const ArticlesService = require('./articles-service');
+//const ArticlesService = require('./articles-service');
+const BookmarkService = require('./bookmark-service');
 
 const app = express();
 
@@ -20,28 +21,56 @@ app.use(cors());
 
 // routes
 
-app.get('/articles', (req, res, next) => {
+app.get('/bookmarks', (req, res, next) => {
   const knexInstance = req.app.get('db');
-  ArticlesService.getAllArticles(knexInstance)
-    .then((articles) => {
-      res.json(articles);
+  BookmarkService.getAllBookmarks(knexInstance)
+    .then((bookmarks) => {
+      res.json(bookmarks);
     })
     .catch(next);
 });
 
-app.get('/articles/:article_id', (req, res, next) => {
+app.get('/bookmarks/:bookmark_id', (req, res, next) => {
   const knexInstance = req.app.get('db');
-  ArticlesService.getById(knexInstance, req.params.article_id)
-    .then(article => {
-      if (!article) {
+  BookmarkService.getById(knexInstance, req.params.bookmark_id)
+    .then((bookmark) => {
+      if (!bookmark) {
         return res.status(404).json({
-          error: { message: 'Article doesn\'t exist' }
+          error: { message: 'Bookmark doesn\'t exist' },
         });
       }
-      res.json(article);
+      res.json(bookmark);
     })
     .catch(next);
 });
+
+
+
+
+
+// these are for the articles 
+// app.get('/articles', (req, res, next) => {
+//   const knexInstance = req.app.get('db');
+//   ArticlesService.getAllArticles(knexInstance)
+//     .then((articles) => {
+//       res.json(articles);
+//     })
+//     .catch(next);
+// });
+
+// app.get('/articles/:article_id', (req, res, next) => {
+//   const knexInstance = req.app.get('db');
+//   ArticlesService.getById(knexInstance, req.params.article_id)
+//     .then(article => {
+//       if (!article) {
+//         return res.status(404).json({
+//           error: { message: 'Article doesn\'t exist' }
+//         });
+//       }
+//       res.json(article);
+//     })
+//     .catch(next);
+// });
 
 app.get('/', (req, res) => {
   res.send('Hello, world!');

@@ -7,9 +7,10 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 //const ArticlesService = require('./articles-service');
-const BookmarkService = require('./bookmark-service');
+const BookmarkService = require('./bookmarks/bookmark-service');
 
 const app = express();
+const jsonParser = express.json();
 
 const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
 
@@ -19,32 +20,51 @@ app.use(helmet());
 app.use(cors());
 
 
+
+
+
+
+
 // routes
 
-app.get('/bookmarks', (req, res, next) => {
-  const knexInstance = req.app.get('db');
-  BookmarkService.getAllBookmarks(knexInstance)
-    .then((bookmarks) => {
-      res.json(bookmarks);
-    })
-    .catch(next);
-});
+// app.get('/bookmarks', (req, res, next) => {
+//   const knexInstance = req.app.get('db');
+//   BookmarkService.getAllBookmarks(knexInstance)
+//     .then((bookmarks) => {
+//       res.json(bookmarks);
+//     })
+//     .catch(next);
+// });
 
-app.get('/bookmarks/:bookmark_id', (req, res, next) => {
-  const knexInstance = req.app.get('db');
-  BookmarkService.getById(knexInstance, req.params.bookmark_id)
-    .then((bookmark) => {
-      if (!bookmark) {
-        return res.status(404).json({
-          error: { message: 'Bookmark doesn\'t exist' },
-        });
-      }
-      res.json(bookmark);
-    })
-    .catch(next);
-});
+// app.get('/bookmarks/:bookmark_id', (req, res, next) => {
+//   const knexInstance = req.app.get('db');
+//   BookmarkService.getById(knexInstance, req.params.bookmark_id)
+//     .then((bookmark) => {
+//       if (!bookmark) {
+//         return res.status(404).json({
+//           error: { message: 'Bookmark doesn\'t exist' },
+//         });
+//       }
+//       res.json(bookmark);
+//     })
+//     .catch(next);
+// });
 
-
+// app.post('/bookmarks', jsonParser, (req, res, next) => {
+//   const { title, url, description, rating } = req.body;
+//   const newBookmark = { title, url, description, rating };
+//   BookmarkService.insertBookmark(
+//     req.app.get('db'),
+//     newBookmark
+//   )
+//     .then(bookmark => {
+//       res
+//         .status(201)
+//         .location(`/bookmarks/${bookmark.id}`)
+//         .json(bookmark);
+//     })
+//     .catch(next);
+// });
 
 
 // these are for the articles 

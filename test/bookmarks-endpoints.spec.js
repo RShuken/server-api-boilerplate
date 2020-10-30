@@ -1,6 +1,7 @@
 /* eslint-disable strict */
 const { expect } = require('chai');
 const knex = require('knex');
+const supertest = require('supertest');
 const app = require('../src/app');
 const { makeBookmarksArray } = require('./bookmarks.fixtures');
 
@@ -44,7 +45,9 @@ describe.only('Bookmarks Endpoints', function () {
 
       it('responds with 200 and all of the bookmarks', () => {
         // eslint-disable-next-line no-undef
-        return supertest(app).get('/bookmarks').expect(200, testBookmarks);
+        return supertest(app)
+          .get('/bookmarks')
+          .expect(200, testBookmarks);
       });
     });
   });
@@ -77,6 +80,38 @@ describe.only('Bookmarks Endpoints', function () {
           .get(`/bookmarks/${bookmarkId}`)
           .expect(200, expectedBookmark);
       });
+    });
+  });
+  
+  describe.only('POST /bookmarks', () => {
+    it('creates a bookmark, responding with 201 and the new bookmark', function () {
+      this.retries(3);
+      const newBookmark = {
+        title: 'Test new bookmark',
+        url: 'www.google.com',
+        description: 'Test new bookmark content...',
+        rating: 5,
+      };
+      return supertest(app)
+        .post('/bookmarks')
+        .send(newBookmark)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.title).to.eql(newBookmark.title);
+          expect(res.body.url).to.eql(newBookmark.url);
+          expect(res.body.description).to.eql(newBookmark.description);
+          expect(res.body.rating).to.eql(newBookmark.rating);
+          expect(res.body).to.have.property('id');
+          expect(res.headers.location).to.eql(`/bookmarks/${res.body.id}`);
+          const expected = new Date().toLocaleString();
+          const actual = new Date(res.body.date_added).toLocaleString();
+          expect(actual).to.eql(expected);
+        })
+        .then(postRes =>
+          supertest(app)
+            .get(`/bookmarks/${postRes.body.id}`)
+            .expect(postRes.body)
+        );
     });
   });
 });

@@ -6,11 +6,10 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-//const ArticlesService = require('./articles-service');
-const BookmarkService = require('./bookmarks/bookmark-service');
+//const articlesRouter = require('./articles/articles-router');
+const bookmarksRouter = require('./bookmarks/bookmarks-router');
 
 const app = express();
-const jsonParser = express.json();
 
 const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
 
@@ -18,78 +17,11 @@ const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
-
-
-
-
+app.use('/bookmarks', bookmarksRouter);
 
 
 
 // routes
-
-// app.get('/bookmarks', (req, res, next) => {
-//   const knexInstance = req.app.get('db');
-//   BookmarkService.getAllBookmarks(knexInstance)
-//     .then((bookmarks) => {
-//       res.json(bookmarks);
-//     })
-//     .catch(next);
-// });
-
-// app.get('/bookmarks/:bookmark_id', (req, res, next) => {
-//   const knexInstance = req.app.get('db');
-//   BookmarkService.getById(knexInstance, req.params.bookmark_id)
-//     .then((bookmark) => {
-//       if (!bookmark) {
-//         return res.status(404).json({
-//           error: { message: 'Bookmark doesn\'t exist' },
-//         });
-//       }
-//       res.json(bookmark);
-//     })
-//     .catch(next);
-// });
-
-// app.post('/bookmarks', jsonParser, (req, res, next) => {
-//   const { title, url, description, rating } = req.body;
-//   const newBookmark = { title, url, description, rating };
-//   BookmarkService.insertBookmark(
-//     req.app.get('db'),
-//     newBookmark
-//   )
-//     .then(bookmark => {
-//       res
-//         .status(201)
-//         .location(`/bookmarks/${bookmark.id}`)
-//         .json(bookmark);
-//     })
-//     .catch(next);
-// });
-
-
-// these are for the articles 
-// app.get('/articles', (req, res, next) => {
-//   const knexInstance = req.app.get('db');
-//   ArticlesService.getAllArticles(knexInstance)
-//     .then((articles) => {
-//       res.json(articles);
-//     })
-//     .catch(next);
-// });
-
-// app.get('/articles/:article_id', (req, res, next) => {
-//   const knexInstance = req.app.get('db');
-//   ArticlesService.getById(knexInstance, req.params.article_id)
-//     .then(article => {
-//       if (!article) {
-//         return res.status(404).json({
-//           error: { message: 'Article doesn\'t exist' }
-//         });
-//       }
-//       res.json(article);
-//     })
-//     .catch(next);
-// });
 
 app.get('/', (req, res) => {
   res.send('Hello, world!');

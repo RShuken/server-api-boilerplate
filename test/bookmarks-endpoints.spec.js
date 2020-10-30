@@ -8,7 +8,7 @@ const { makeBookmarksArray } = require('./bookmarks.fixtures');
 
 
 
-describe.only('Bookmarks Endpoints', function () {
+describe('Bookmarks Endpoints', function () {
   let db;
   const dbName = 'bookmarks';
 
@@ -52,7 +52,7 @@ describe.only('Bookmarks Endpoints', function () {
     });
   });
 
-  describe('GET /bookmarks/:bookmark_id', () => {
+  describe.only('GET /bookmarks/:bookmark_id', () => {
     context('Given no bookmarks', () => {
       it('responds with 404', () => {
         const bookmarkId = 123456;
@@ -81,9 +81,37 @@ describe.only('Bookmarks Endpoints', function () {
           .expect(200, expectedBookmark);
       });
     });
+
+    context('Given an XSS attack bookmark', () => {
+      const maliciousbookmark = {
+        id: 911,
+        title: 'Naughty naughty very naughty <script>alert("xss");</script>',
+        url: 'www.google.com',
+        description: 'Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.',
+        rating: 5,
+      };
+
+      beforeEach('insert malicious bookmark', () => {
+        return db
+          .into('bookmarks')
+          .insert([ maliciousbookmark ]);
+      });
+
+      it('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/bookmarks/${maliciousbookmark.id}`)
+          .expect(200)
+          .expect(res => {
+            expect(res.body.title).to.eql('Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;');
+            expect(res.body.description).to.eql('Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.');
+            expect(res.body.url).to.eql('www.google.com');
+            expect(res.body.rating).to.eql(5);
+          });
+      });
+    });
   });
   
-  describe.only('POST /bookmarks', () => {
+  describe('POST /bookmarks', () => {
     it('creates a bookmark, responding with 201 and the new bookmark', function () {
       this.retries(3);
       const newBookmark = {
@@ -112,6 +140,29 @@ describe.only('Bookmarks Endpoints', function () {
             .get(`/bookmarks/${postRes.body.id}`)
             .expect(postRes.body)
         );
+    });
+
+    // declaring an arry of the required fields
+    const requiredFields = ['title', 'url', 'description', 'rating'];
+    //this loops through the array making field equal to each key
+    requiredFields.forEach(field => {
+      const newBookmark = {
+        title: 'Test new bookmark',
+        url: 'www.google.com',
+        description: 'Test new bookmark content...',
+        rating: 5,
+      };
+
+      it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+        delete newBookmark[field];
+
+        return supertest(app)
+          .post('/bookmarks')
+          .send(newBookmark)
+          .expect(400, {
+            error: { message: `Missing '${field}' in request body` },
+          });
+      });
     });
   });
 });

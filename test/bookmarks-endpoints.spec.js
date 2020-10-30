@@ -102,6 +102,7 @@ describe('Bookmarks Endpoints', function () {
           .get(`/bookmarks/${maliciousbookmark.id}`)
           .expect(200)
           .expect(res => {
+            // eslint-disable-next-line no-useless-escape
             expect(res.body.title).to.eql('Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;');
             expect(res.body.description).to.eql('Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.');
             expect(res.body.url).to.eql('www.google.com');

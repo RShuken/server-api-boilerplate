@@ -3,6 +3,6 @@ CREATE TABLE bookmarks (
     title TEXT NOT NULL,
     url TEXT NOT NULL,
     description TEXT,
-    rating NUMBER NOT NULL,
+    rating INTEGER NOT NULL,
     date_added TIMESTAMPTZ DEFAULT now() NOT NULL
 );

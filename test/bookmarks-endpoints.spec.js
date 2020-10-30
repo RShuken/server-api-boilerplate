@@ -56,7 +56,7 @@ describe.only('Bookmarks Endpoints', function () {
         // eslint-disable-next-line no-undef
         return supertest(app)
           .get(`/bookmarks/${bookmarkId}`)
-          .expect(404, { error: { message: 'Boookmark doesn\'t exist' } });
+          .expect(404, { error: { message: 'Bookmark doesn\'t exist' } });
       });
     });
 
@@ -71,7 +71,7 @@ describe.only('Bookmarks Endpoints', function () {
 
       it('responds with 200 and the specified bookmark', () => {
         const bookmarkId = 2;
-        const expectedBookmark = testBookmarks[bookmarkId - 1];
+        const expectedBookmark = testBookmarks[bookmarkId];
         // eslint-disable-next-line no-undef
         return supertest(app)
           .get(`/bookmarks/${bookmarkId}`)

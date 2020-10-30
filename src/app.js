@@ -47,7 +47,6 @@ app.get('/bookmarks/:bookmark_id', (req, res, next) => {
 
 
 
-
 // these are for the articles 
 // app.get('/articles', (req, res, next) => {
 //   const knexInstance = req.app.get('db');

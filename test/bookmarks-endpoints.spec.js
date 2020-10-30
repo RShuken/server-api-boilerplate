@@ -191,4 +191,31 @@ describe('Bookmarks Endpoints', function () {
         });
     });
   });
+
+  describe.only('DELETE /bookmarks/:bookmark_id', () => {
+    context('Given there are bookmarks in the database', () => {
+      const testBookmarks = makeBookmarksArray();
+
+      beforeEach('insert bookmarks', () => {
+        return db
+          .into('bookmarks')
+          .insert(testBookmarks);
+      });
+
+      it('responds with 204 and removes the bookmark', () => {
+        const idToRemove = 0;
+        const expectedBookmarks = testBookmarks.filter(bookmark => bookmark.id !== idToRemove);
+        return supertest(app)
+          .delete(`/bookmarks/${idToRemove}`)
+          .expect(204)
+          .then(res => {
+            return supertest(app)
+              .get('/bookmarks')
+              .expect(expectedBookmarks);
+          }
+          );
+      });
+    });
+  });
 });
+

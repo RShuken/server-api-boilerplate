@@ -59,6 +59,15 @@ bookmarksRouter.route('/:bookmark_id').get((req, res, next) => {
       res.json(serializeBookmark(bookmark));
     })
     .catch(next);
+}).delete((req, res, next) => {
+  BookmarkService.deleteBookmark(
+    req.app.get('db'),
+    req.params.bookmark_id
+  )
+    .then(() => {
+      res.status(204).end();
+    })
+    .catch(next);
 });
 
 

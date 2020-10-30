@@ -22,7 +22,7 @@ function makeBookmarksArray() {
     {
       id: 2,
       title: 'Github',
-      url: 'http://www.github.com',
+      url: 'http://www.github.com', 
       description:
         'brings together the world\'s largest community of developers.',
       rating: 4,

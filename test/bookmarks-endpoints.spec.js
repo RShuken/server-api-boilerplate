@@ -52,7 +52,7 @@ describe('Bookmarks Endpoints', function () {
     });
   });
 
-  describe.only('GET /bookmarks/:bookmark_id', () => {
+  describe('GET /bookmarks/:bookmark_id', () => {
     context('Given no bookmarks', () => {
       it('responds with 404', () => {
         const bookmarkId = 123456;
@@ -83,7 +83,7 @@ describe('Bookmarks Endpoints', function () {
     });
 
     context('Given an XSS attack bookmark', () => {
-      const maliciousbookmark = {
+      const maliciousBookmark = {
         id: 911,
         title: 'Naughty naughty very naughty <script>alert("xss");</script>',
         url: 'www.google.com',
@@ -94,12 +94,12 @@ describe('Bookmarks Endpoints', function () {
       beforeEach('insert malicious bookmark', () => {
         return db
           .into('bookmarks')
-          .insert([ maliciousbookmark ]);
+          .insert([ maliciousBookmark ]);
       });
 
       it('removes XSS attack content', () => {
         return supertest(app)
-          .get(`/bookmarks/${maliciousbookmark.id}`)
+          .get(`/bookmarks/${maliciousBookmark.id}`)
           .expect(200)
           .expect(res => {
             // eslint-disable-next-line no-useless-escape
@@ -164,6 +164,31 @@ describe('Bookmarks Endpoints', function () {
             error: { message: `Missing '${field}' in request body` },
           });
       });
+    });
+
+    it('removes XSS attack content from response', () => {
+      const maliciousBookmark = {
+        id: 911,
+        title:
+                'Naughty naughty very naughty <script>alert("xss");</script>',
+        url: 'www.google.com',
+        description:
+                'Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.',
+        rating: 5,
+      };
+
+      return supertest(app)
+        .post('/bookmarks')
+        .send(maliciousBookmark)
+        .expect(201)
+        .expect((res) => {
+          expect(res.body.title).to.eql(
+            'Naughty naughty very naughty <script>alert("xss");</script>'
+          );
+          expect(res.body.description).to.eql(
+            'Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.'
+          );
+        });
     });
   });
 });
